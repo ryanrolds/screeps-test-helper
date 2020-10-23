@@ -36,6 +36,56 @@ describe('mockInstanceOf', () => {
     expect(mockCreep.build(mockInstanceOf<ConstructionSite>())).toEqual(OK);
   });
 
+  it('allows mocking complex interfaces', () => {
+    enum E {
+      A = 'a',
+      B = 'b'
+    }
+
+    type U = 'A' | 7
+
+    interface I {
+      strings: string[],
+      tuple: [E, U, boolean],
+      mixed: Array<number | I | I[]>
+      nested?: I
+    }
+
+    const mock = mockInstanceOf<I>({
+      strings: ['foo', 'bar'],
+      tuple: [E.A, 7, true],
+      mixed: [
+        3,
+        4,
+        {},
+        { strings: ['a'] },
+        [
+          { mixed: [] },
+          { strings: ['x', 'y', 'z'] }
+        ]
+      ],
+      nested: {
+        nested: {
+          nested: {
+            mixed: [{
+              tuple: [E.B, 'A', false]
+            }]
+          }
+        }
+      }
+    });
+    const nestedI = mock.nested?.nested?.nested?.mixed[0];
+
+    expect(typeof nestedI).toBe('object');
+    expect(Array.isArray(nestedI)).toBe(false);
+
+    if (typeof nestedI === 'object' && !Array.isArray(nestedI)) {
+      expect((nestedI).tuple[1]).toBe('A');
+    }
+
+    expect(() => (mock.mixed[4] as I[])[1].tuple).toThrow('Unexpected access to unmocked property "mixed[4][1].tuple"')
+  })
+
   it('throws if you access an unmocked field of a deep partial mock', () => {
     const mockCreep = mockInstanceOf<Creep>({
       body: [
