@@ -86,6 +86,42 @@ describe('mockInstanceOf', () => {
     expect(() => (mock.mixed[4] as I[])[1].tuple).toThrow('Unexpected access to unmocked property "mixed[4][1].tuple"')
   })
 
+  it('checks the types of mocked fields, even nested ones', () => {
+    mockInstanceOf<Creep>({
+      spawning: true,
+      room: {
+        controller: {
+          owner: {
+            username: 'Bob'
+          }
+        }
+      }
+    });
+    mockInstanceOf<Creep>({
+      // @ts-expect-error
+      spawning: {},
+      room: {
+        controller: {
+          owner: {
+            // @ts-expect-error
+            username: false
+          }
+        }
+      }
+    });
+    mockInstanceOf<StructureSpawn>({
+      spawning: {
+        directions: [TOP_LEFT, BOTTOM_RIGHT]
+      }
+    });
+    mockInstanceOf<StructureSpawn>({
+      spawning: {
+        // @ts-expect-error
+        directions: [TOP_LEFT, BOTTOM_RIGHT, 9]
+      }
+    });
+  });
+
   it('throws if you access an unmocked field of a deep partial mock', () => {
     const mockCreep = mockInstanceOf<Creep>({
       body: [
