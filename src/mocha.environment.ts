@@ -1,9 +1,7 @@
 import {setup} from './environment'
 
-const MochaEnvironment = {
+export const mochaHooks = {
   beforeAll() {
     setup(global)
   }
 };
-
-export default MochaEnvironment;
