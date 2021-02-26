@@ -3,7 +3,7 @@ import {mockGlobal, mockInstanceOf, mockRoomPositionConstructor, mockStructure} 
 describe('mockInstanceOf', () => {
 
   it('allows partial mocking of objects', () => {
-    const mockCreep = mockInstanceOf<Creep>({ fatigue: 2 });
+    const mockCreep = mockInstanceOf<Creep>({fatigue: 2});
     expect(mockCreep.fatigue).toEqual(2);
   });
 
@@ -32,12 +32,12 @@ describe('mockInstanceOf', () => {
       build: () => OK
     });
     expect(mockCreep.body[1].type).toEqual(WORK);
-    expect(mockCreep.room.controller?.owner.username).toEqual('some-user');
+    expect(mockCreep.room.controller?.owner?.username).toEqual('some-user');
     expect(mockCreep.build(mockInstanceOf<ConstructionSite>())).toEqual(OK);
   });
 
   it('allows mocking constants', () => {
-    const mockSpawning = mockInstanceOf<Spawning>({ directions: [TOP] })
+    const mockSpawning = mockInstanceOf<Spawning>({directions: [TOP]})
     expect(mockSpawning.directions).toEqual([TOP])
   })
 
@@ -176,11 +176,12 @@ describe('mockRoomPositionConstructor', () => {
     expect(() => RoomPosition).toThrow('RoomPosition is not defined');
     mockRoomPositionConstructor(global);
     expect(RoomPosition).toBeDefined();
+
     const pos = new RoomPosition(x, y, roomName);
     expect(pos.x).toEqual(10);
     expect(pos.y).toEqual(20);
     expect(pos.roomName).toEqual('W1N1');
-    expect(JSON.parse(JSON.stringify(pos))).toEqual({ x, y, roomName });
+    expect(JSON.parse(JSON.stringify(pos))).toEqual({x, y, roomName});
   });
 
 });

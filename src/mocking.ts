@@ -1,5 +1,6 @@
 import * as util from "util";
-import jestMock from "jest-mock";
+//import jestMock from "jest-mock";
+import * as sinon from "sinon"
 
 
 /**
@@ -7,12 +8,12 @@ import jestMock from "jest-mock";
  */
 type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends Array<string> ? Array<string> :
-                   T[P] extends Array<number> ? Array<number> :
-                   T[P] extends Array<infer U> ? Array<DeepPartial<U>> :
-                   T[P] extends Id<infer V> ? Id<V> :
-                   T[P] extends (object | undefined) ? DeepPartial<T[P]> :
-                   T[P];
-} & { [key: string]: any };
+  T[P] extends Array<number> ? Array<number> :
+  T[P] extends Array<infer U> ? Array<DeepPartial<U>> :
+  T[P] extends Id<infer V> ? Id<V> :
+  T[P] extends (object | undefined) ? DeepPartial<T[P]> :
+  T[P];
+} & {[key: string]: any};
 
 /**
  * Conditional type for all concrete implementations of Structure.
@@ -45,6 +46,7 @@ type ConcreteStructure<T extends StructureConstant> =
 /**
  * Properties I've seen having been accessed internally by Jest's matchers and message formatters (there may be others).
  */
+/*
 const jestInternalStuff: Array<symbol | string | number> = [
   Symbol.iterator,
   Symbol.toStringTag,
@@ -58,6 +60,7 @@ const jestInternalStuff: Array<symbol | string | number> = [
   "tagName",
   "hasAttribute",
 ];
+*/
 
 /**
  * Mocks a global object instance, like Game or Memory.
@@ -68,7 +71,7 @@ const jestInternalStuff: Array<symbol | string | number> = [
  */
 function mockGlobal<T extends object>(name: string, mockedProps: DeepPartial<T> = {}, allowUndefinedAccess: boolean = false) {
   const g = global as any;
-  const finalMockedProps = {...mockedProps, mockClear: () => {}};
+  const finalMockedProps = {...mockedProps, mockClear: () => { }};
   g[name] = createMock<T>(finalMockedProps, allowUndefinedAccess, name);
 }
 
@@ -91,16 +94,16 @@ function createMock<T extends object>(mockedProps: DeepPartial<T>, allowUndefine
 
   Object.entries(mockedProps).forEach(([propName, mockedValue]) => {
     target[propName as keyof T] =
-      typeof mockedValue === 'function' ? jestMock.fn(mockedValue)
+      typeof mockedValue === 'function' ? sinon.fake(mockedValue)
         : Array.isArray(mockedValue) ? mockedValue.map((element, index) => isConstant(element) ? element : createMock(element, allowUndefinedAccess, concatenatePath(path, `${propName}[${index}]`)))
-        : typeof mockedValue === 'object' && shouldMockObject(mockedValue) ? createMock(mockedValue, allowUndefinedAccess, concatenatePath(path, propName))
-        : mockedValue;
+          : typeof mockedValue === 'object' && shouldMockObject(mockedValue) ? createMock(mockedValue, allowUndefinedAccess, concatenatePath(path, propName))
+            : mockedValue;
   });
   return new Proxy<T>(target as T, {
     get(t: T, p: PropertyKey): any {
       if (p in target) {
         return target[p.toString()];
-      } else if (!allowUndefinedAccess && !jestInternalStuff.includes(p)) {
+      } else if (!allowUndefinedAccess /*&& !jestInternalStuff.includes(p)*/) {
         throw new Error(
           `Unexpected access to unmocked property "${concatenatePath(path, p.toString())}".\n` +
           'Did you forget to mock it?\n' +
@@ -115,9 +118,9 @@ function createMock<T extends object>(mockedProps: DeepPartial<T>, allowUndefine
 
 function shouldMockObject(value: object) {
   return (
-      value !== null
-      && Object.getPrototypeOf(value) === Object.prototype
-      && !util.types.isProxy(value)
+    value !== null
+    && Object.getPrototypeOf(value) === Object.prototype
+    && !util.types.isProxy(value)
   );
 }
 
@@ -128,7 +131,7 @@ function concatenatePath(parentPath: string, propName: string) {
 /**
  * Keeps counters for each structure type, to generate unique IDs for them.
  */
-const structureCounters: { [key: string]: number } = {};
+const structureCounters: {[key: string]: number} = {};
 
 /**
  * Creates a mock instance of a structure, with a unique ID, structure type and toJSON.
@@ -146,7 +149,7 @@ function mockStructure<T extends StructureConstant>(structureType: T, mockedProp
     id,
     structureType,
     toJSON() {
-      return { id, structureType };
+      return {id, structureType};
     },
     ...mockedProps
   });
@@ -156,7 +159,7 @@ function mockStructure<T extends StructureConstant>(structureType: T, mockedProp
  * Call this once before running tests that create new instances of RoomPosition.
  */
 function mockRoomPositionConstructor(globalObject: any) {
-  globalObject.RoomPosition = jestMock.fn(mockRoomPosition);
+  globalObject.RoomPosition = sinon.fake(mockRoomPosition);
 }
 
 /**
@@ -167,7 +170,7 @@ function mockRoomPosition(x: number, y: number, roomName: string): RoomPosition 
     x,
     y,
     roomName,
-    toJSON: () => ({ x, y, roomName })
+    toJSON: () => ({x, y, roomName})
   });
 }
 
