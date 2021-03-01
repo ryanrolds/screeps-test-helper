@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ryanrolds/screeps-jest.git"
+    "url": "git+https://github.com/eduter/screeps-jest.git"
   },
   "author": "eduter",
   "bugs": {

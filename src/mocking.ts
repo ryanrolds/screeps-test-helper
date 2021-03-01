@@ -44,23 +44,21 @@ type ConcreteStructure<T extends StructureConstant> =
   : never;
 
 /**
- * Properties I've seen having been accessed internally by Jest's matchers and message formatters (there may be others).
+ * Properties I've seen having been accessed internally.
  */
-/*
-const jestInternalStuff: Array<symbol | string | number> = [
+const internalStuff: Array<symbol | string | number> = [
   Symbol.iterator,
   Symbol.toStringTag,
-  "asymmetricMatch",
-  "$$typeof",
-  "nodeType",
-  "@@__IMMUTABLE_ITERABLE__@@",
-  "@@__IMMUTABLE_RECORD__@@",
-  "_isMockFunction",
-  "mockClear",
-  "tagName",
-  "hasAttribute",
+  //"asymmetricMatch",
+  //"$$typeof",
+  //"nodeType",
+  //"@@__IMMUTABLE_ITERABLE__@@",
+  //"@@__IMMUTABLE_RECORD__@@",
+  //"_isMockFunction",
+  //"mockClear",
+  //"tagName",
+  //"hasAttribute",
 ];
-*/
 
 /**
  * Mocks a global object instance, like Game or Memory.
@@ -94,7 +92,7 @@ function createMock<T extends object>(mockedProps: DeepPartial<T>, allowUndefine
 
   Object.entries(mockedProps).forEach(([propName, mockedValue]) => {
     target[propName as keyof T] =
-      typeof mockedValue === 'function' ? sinon.fake(mockedValue)
+      typeof mockedValue === 'function' ? mockedValue
         : Array.isArray(mockedValue) ? mockedValue.map((element, index) => isConstant(element) ? element : createMock(element, allowUndefinedAccess, concatenatePath(path, `${propName}[${index}]`)))
           : typeof mockedValue === 'object' && shouldMockObject(mockedValue) ? createMock(mockedValue, allowUndefinedAccess, concatenatePath(path, propName))
             : mockedValue;
@@ -103,7 +101,7 @@ function createMock<T extends object>(mockedProps: DeepPartial<T>, allowUndefine
     get(t: T, p: PropertyKey): any {
       if (p in target) {
         return target[p.toString()];
-      } else if (!allowUndefinedAccess /*&& !jestInternalStuff.includes(p)*/) {
+      } else if (!allowUndefinedAccess && !internalStuff.includes(p)) {
         throw new Error(
           `Unexpected access to unmocked property "${concatenatePath(path, p.toString())}".\n` +
           'Did you forget to mock it?\n' +
@@ -159,7 +157,7 @@ function mockStructure<T extends StructureConstant>(structureType: T, mockedProp
  * Call this once before running tests that create new instances of RoomPosition.
  */
 function mockRoomPositionConstructor(globalObject: any) {
-  globalObject.RoomPosition = sinon.fake(mockRoomPosition);
+  globalObject.RoomPosition = mockRoomPosition;
 }
 
 /**
