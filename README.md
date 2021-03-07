@@ -2,7 +2,7 @@
 
 > Fork of https://github.com/eduter/screeps-jest that has been updated to be test framework agnostic. **All credit should go to Eduter.**
 
-Environment and helper functions for unit testing your Screeps AI.
+Helper functions for unit testing your Screeps AI.
 
 Features:
 
@@ -22,7 +22,6 @@ Before any of your tests run you will need to call the `setup(global)` function.
 ### Jest
 
 There is a Jest Environment provided.
-
 
 ### Mocha
 

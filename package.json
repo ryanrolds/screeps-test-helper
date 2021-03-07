@@ -1,6 +1,6 @@
 {
   "name": "screeps-test-helper",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Helper functions and environment for unit testing your Screeps code.",
   "main": "dist/index.js",
   "peerDependencies": {
