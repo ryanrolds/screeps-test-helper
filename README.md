@@ -1,4 +1,4 @@
-# Screeps-Jest
+# Screeps Test Helper
 
 > Fork of https://github.com/eduter/screeps-jest that has been updated to be test framework agnostic. **All credit should go to Eduter.**
 
@@ -14,7 +14,38 @@ Features:
 ## How to install it?
 
 ```
-npm install ryanrolds/screeps-test-helper --save-dev
+npm install screeps-test-helper --save-dev
+```
+
+Before any of your tests run you will need to call the `setup(global)` function.
+
+### Jest
+
+There is a Jest Environment provided.
+
+
+### Mocha
+
+Mocha will require creating a file that calls the setup function that is loading using `--require` when using the CLI or referenced in the `.mocharc.*` file.
+
+Example `./src/test_globals.ts` for Mocha:
+```
+import {setup} from 'screeps-test-helper';
+setup(global);
+```
+
+The file can be referenced by the `.mocharc.json` file like so:
+```
+{
+  "extension": [
+    "ts"
+  ],
+  "spec": "./src/**/*.test.ts",
+  "require": [
+    "ts-node/register",
+    "./src/test_globals.ts"
+  ]
+}
 ```
 
 ## How to use it?

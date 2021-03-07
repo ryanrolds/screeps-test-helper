@@ -1,12 +1,14 @@
 {
   "name": "screeps-test-helper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Helper functions and environment for unit testing your Screeps code.",
   "main": "dist/index.js",
   "peerDependencies": {
     "jest": "<=26"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jest-environment-node": "^26.6.2"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.3",
     "@types/lodash": "^3",
@@ -28,11 +30,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eduter/screeps-jest.git"
+    "url": "git+https://github.com/ryanrolds/screeps-test-helper.git"
   },
   "author": "eduter",
   "bugs": {
-    "url": "https://github.com/eduter/screeps-jest/issues"
+    "url": "https://github.com/ryanrolds/screeps-test-helper/issues"
   },
-  "homepage": "https://github.com/eduter/screeps-jest#readme"
+  "homepage": "https://github.com/ryanrolds/screeps-test-helper#readme"
 }
